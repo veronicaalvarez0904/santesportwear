@@ -20,7 +20,7 @@
   --ink: #111111;
   --ivory: #ece8e2;
   --paper: #f8f5f1;
-  --sand: #efe9e2;
+  --sand: #eee8e1;
   --blush: #e7cfc6;
   --rose: #a5675b;
   --muted: #6f6862;
@@ -167,7 +167,7 @@ header.site {
 .gallery .main { position: relative; aspect-ratio: 4 / 5; max-height: 62vh; width: 100%; }
 @media (min-width: 860px) { .gallery .main { max-height: none; height: 100%; min-height: 520px; aspect-ratio: auto; } }
 .gallery .main img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 6%; }
-.gallery .main img.full { object-fit: cover; padding: 0; }
+.gallery .main img.full { object-fit: contain; padding: 0; }
 .gallery .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(248,245,241,.9); cursor: pointer; display: grid; place-items: center; }
 .gallery .nav svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 1.8; }
 .gallery .prev { left: 10px; } .gallery .next { right: 10px; }
@@ -395,17 +395,20 @@ const PRODUCTS = [
 /* Fondo de cada foto (para que la prenda se vea sin bordes) */
 const WHITE_BG = new Set(["campana-blanco","campana-cafe","campana-muestra","conj-top-beige","falda-beige","falda-gris","falda-negra","legg-efecto-azul","short-azul","short-beige","short-corto-azul","short-corto-gris","short-verde"]);
 const FULL_BG = { "ent-ml-negro": "#b09575", "ent-mc-negro": "#b29c78", "ent-largo-negro": "#b49c75", "legg-malla-gris": "#8e7e6f" }; // fotos con fondo real: llenan el recuadro
-const FULL = new Set(Object.keys(FULL_BG));
-const bgOf = (img) => FULL_BG[img] || (img === "conj-1-muestra" ? "#2c2b28" : (WHITE_BG.has(img) ? "#ffffff" : "#000000"));
+/* Fotos de estudio: todas vienen en 4:5 sobre fondo arena; las de modelo conservan su fondo. */
+const FULL = { has: () => true };
+const STUDIO_BG = "#eee8e1";
+const bgOf = (img) => img.endsWith("muestra") ? (img === "campana-muestra" ? "#ffffff" : "#000000") : STUDIO_BG;
 
 
 const src = (img) => `img/${img}.jpg`;
+const srcSm = (img) => `img/sm/${img}.jpg`;
 const money = (n) => "$" + Math.round(n).toLocaleString("es-CO");
 const catLabel = (k) => CATEGORIES.find(c => c[0] === k)[1];
 const waLink = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 const askMsg = (p) => `Hola, me interesa el ${p.name}. ¿Qué colores tienes disponibles?`;
 const WA_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>`;
-const imgTag = (img, cls = "") => `<img src="${src(img)}" alt="" loading="lazy" class="${[cls, FULL.has(img) ? "full" : ""].join(" ").trim()}">`;
+const imgTag = (img, cls = "") => `<img src="${srcSm(img)}" alt="" loading="lazy" class="${[cls, FULL.has(img) ? "full" : ""].join(" ").trim()}">`;
 
 /* Enlaces generales de WhatsApp */
 document.getElementById("waPath").setAttribute("d", document.getElementById("wa").getAttribute("d"));
@@ -458,7 +461,7 @@ PRODUCTS.forEach((p, idx) => {
     el.dataset.sel = d.dataset.i;
     frame.style.background = bgOf(c.img);
     const m = frame.querySelector("img.main");
-    m.src = src(c.img); m.classList.toggle("full", FULL.has(c.img));
+    m.src = srcSm(c.img); m.classList.toggle("full", FULL.has(c.img));
     el.querySelectorAll(".dot").forEach(x => x.setAttribute("aria-pressed", x === d));
   }));
   grid.appendChild(el);

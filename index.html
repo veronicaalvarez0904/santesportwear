@@ -132,11 +132,18 @@ header.site {
   .card .frame:hover img.alt { opacity: 1; }
   .card .frame:hover img.main.has-alt { opacity: 0; }
 }
-.badge {
-  position: absolute; left: 10px; top: 10px; z-index: 1;
-  background: var(--blush); color: var(--ink); font-size: 10px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
-  padding: 5px 9px; border-radius: 999px;
-}
+.badges { position: absolute; left: 10px; top: 10px; z-index: 1; display: flex; flex-wrap: wrap; gap: 5px; pointer-events: none; }
+.badge { background: var(--blush); color: var(--ink); font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; padding: 5px 9px; border-radius: 999px; }
+.badge.off { background: var(--ink); color: var(--ivory); letter-spacing: .06em; }
+.price .was { font-family: var(--font-body); font-weight: 400; font-size: .62em; color: var(--muted); margin-left: 8px; text-decoration-thickness: 1px; }
+.price .pct { font-family: var(--font-body); font-weight: 500; font-size: .5em; letter-spacing: .08em; color: var(--rose); margin-left: 6px; vertical-align: .15em; }
+.announce b { font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: .08em; }
+.countdown { margin-top: 28px; }
+.countdown .label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--blush); }
+.countdown .tiles { display: flex; gap: 8px; margin-top: 10px; }
+.countdown .tiles div { min-width: 64px; text-align: center; border: 1px solid color-mix(in srgb, var(--ivory) 22%, transparent); border-radius: 10px; padding: 10px 6px 8px; }
+.countdown .tiles b { display: block; font-family: var(--font-display); font-weight: 500; font-size: 30px; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+.countdown .tiles span { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, var(--ivory) 60%, transparent); }
 .card .info { display: flex; flex-direction: column; gap: 6px; }
 .card .name {
   background: none; border: 0; padding: 0; text-align: left; cursor: pointer; color: var(--ink);
@@ -208,7 +215,7 @@ footer small { display: block; font-size: 11px; letter-spacing: .18em; text-tran
 <body>
 
 
-<div class="announce gutter">Liquidación de temporada<span>·</span>Unidades limitadas por color</div>
+<div class="announce gutter">Gran liquidación · 15% OFF<span>·</span><span id="cdBar" style="opacity:1;margin:0">Hasta el domingo 1 de noviembre</span></div>
 
 <header class="site gutter">
   <div class="inner bar">
@@ -221,13 +228,14 @@ footer small { display: block; font-size: 11px; letter-spacing: .18em; text-tran
 <section class="hero gutter" id="top">
   <div class="inner">
     <div>
-      <div class="eyebrow">Santé · Liquidación</div>
+      <div class="eyebrow">Gran liquidación · 15% OFF</div>
       <h1>Muévete con <em>elegancia</em></h1>
-      <p>Conjuntos, enterizos, leggings, faldas y shorts que estilizan tu figura en cada entrenamiento. Precios de salida en todas las prendas.</p>
+      <p>Conjuntos, enterizos, leggings, faldas y shorts que estilizan tu figura en cada entrenamiento. 15% de descuento en todas las prendas hasta el domingo 1 de noviembre.</p>
       <div class="ctas">
         <a class="btn light" href="#coleccion">Ver colección</a>
         <a class="btn ghost" id="waHero" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>WhatsApp</a>
       </div>
+      <div class="countdown" id="cd"><div class="label">La liquidación termina en</div><div class="tiles"><div><b id="cdD">--</b><span>Días</span></div><div><b id="cdH">--</b><span>Horas</span></div><div><b id="cdM">--</b><span>Min</span></div><div><b id="cdS">--</b><span>Seg</span></div></div></div>
       <div class="stats" id="stats"></div>
     </div>
     <div class="collage" aria-hidden="true">
@@ -294,7 +302,7 @@ const CATEGORIES = [
 const PRODUCTS = [
   { id: "conj-ml", cat: "conjuntos", name: "Conjunto manga larga",
     desc: "Crop top de manga larga y legging de tiro alto con efecto push-up. Tejido sin costuras con textura lavada.",
-    price: 70000, before: null, sizes: null,
+    price: 70000, before: 82400, sizes: null,
     models: ["conj-muestra", "conj-2-muestra", "conj-1-muestra"],
     colors: [
       { name: "Azul", hex: "#3d5c9c", img: "conj-auzul" },
@@ -306,7 +314,7 @@ const PRODUCTS = [
     ] },
   { id: "conj-top", cat: "conjuntos", name: "Conjunto top + short",
     desc: "Top deportivo de tiras y short ciclista de tiro alto con efecto push-up.",
-    price: 60000, before: null, sizes: null,
+    price: 60000, before: 70600, sizes: null,
     models: ["conj-top-muestra"],
     colors: [
       { name: "Beige", hex: "#d9d0c3", img: "conj-top-beige" },
@@ -315,7 +323,7 @@ const PRODUCTS = [
     ] },
   { id: "conj-falda", cat: "conjuntos", name: "Conjunto top + falda short",
     desc: "Top sin mangas y falda con short interno. Cómodo para tenis, pádel o el día a día.",
-    price: 60000, before: null, sizes: null,
+    price: 60000, before: 70600, sizes: null,
     models: [],
     colors: [
       { name: "Beige", hex: "#e9e3d7", img: "falda-short-beige" },
@@ -323,7 +331,7 @@ const PRODUCTS = [
     ] },
   { id: "enterizo", cat: "enterizos", name: "Enterizo corto",
     desc: "Enterizo sin mangas, largo ciclista, en tejido acanalado que moldea la figura.",
-    price: 30000, before: null, sizes: null,
+    price: 30000, before: 35300, sizes: null,
     models: ["ent-muestra"],
     colors: [
       { name: "Azul", hex: "#24376e", img: "ent-azul" },
@@ -333,22 +341,22 @@ const PRODUCTS = [
     ] },
   { id: "enterizo-ml", cat: "enterizos", name: "Enterizo manga larga",
     desc: "Enterizo de manga larga y cuello en V, largo ciclista, en tela lisa y suave al tacto.",
-    price: 60000, before: null, sizes: null,
+    price: 60000, before: 70600, sizes: null,
     models: [],
     colors: [ { name: "Negro", hex: "#1d1e22", img: "ent-ml-negro" } ] },
   { id: "enterizo-mc", cat: "enterizos", name: "Enterizo manga corta con cremallera",
     desc: "Enterizo de manga corta y cuello alto con cremallera, largo ciclista, en tejido acanalado.",
-    price: 30000, before: null, sizes: null,
+    price: 30000, before: 35300, sizes: null,
     models: [],
     colors: [ { name: "Negro", hex: "#1d1e22", img: "ent-mc-negro" } ] },
   { id: "enterizo-largo", cat: "enterizos", name: "Enterizo largo manga larga",
     desc: "Enterizo de cuerpo completo con escote cuadrado, manga larga con abertura para el pulgar y tejido acanalado sin costuras.",
-    price: 70000, before: null, sizes: null,
+    price: 70000, before: 82400, sizes: null,
     models: [],
     colors: [ { name: "Negro", hex: "#1d1e22", img: "ent-largo-negro" } ] },
   { id: "campana", cat: "pantalones", name: "Pantalón campana",
     desc: "Legging de bota campana y tiro alto, con efecto push-up atrás.",
-    price: 40000, before: null, sizes: null,
+    price: 40000, before: 47100, sizes: null,
     models: ["campana-muestra"],
     colors: [
       { name: "Blanco", hex: "#eceeee", img: "campana-blanco" },
@@ -356,17 +364,17 @@ const PRODUCTS = [
     ] },
   { id: "legging", cat: "pantalones", name: "Legging efecto lavado",
     desc: "Legging de tiro alto con textura tipo jean lavado y efecto push-up.",
-    price: 30000, before: null, sizes: null,
+    price: 30000, before: 35300, sizes: null,
     models: [],
     colors: [ { name: "Azul", hex: "#5082c0", img: "legg-efecto-azul" } ] },
   { id: "legging-malla", cat: "pantalones", name: "Leggins sin push up",
     desc: "Legging de tiro alto con pretina ancha y paneles de malla transpirable a los lados. Tejido sin costuras.",
-    price: 30000, before: null, sizes: null,
+    price: 30000, before: 35300, sizes: null,
     models: [],
     colors: [ { name: "Gris claro", hex: "#d3d5cc", img: "legg-malla-gris" } ] },
   { id: "falda", cat: "faldas", name: "Falda plisada",
     desc: "Falda short plisada de pretina ancha, con short interno.",
-    price: 55000, before: null, sizes: null,
+    price: 55000, before: 64800, sizes: null,
     models: [],
     colors: [
       { name: "Beige", hex: "#ecebe5", img: "falda-beige" },
@@ -375,7 +383,7 @@ const PRODUCTS = [
     ] },
   { id: "short", cat: "shorts", name: "Short ciclista",
     desc: "Short de tiro alto, largo medio, con efecto push-up.",
-    price: 20000, before: null, sizes: null,
+    price: 20000, before: 23600, sizes: null,
     models: [],
     colors: [
       { name: "Azul", hex: "#3b5b94", img: "short-azul" },
@@ -384,7 +392,7 @@ const PRODUCTS = [
     ] },
   { id: "short-corto", cat: "shorts", name: "Short corto fruncido",
     desc: "Short corto de pretina alta con fruncido atrás que realza la cola.",
-    price: 20000, before: null, sizes: null,
+    price: 20000, before: 23600, sizes: null,
     models: [],
     colors: [
       { name: "Azul", hex: "#2d47a1", img: "short-corto-azul" },
@@ -404,6 +412,20 @@ const bgOf = (img) => img.endsWith("muestra") ? (img === "campana-muestra" ? "#f
 const src = (img) => `img/${img}.jpg`;
 const srcSm = (img) => `img/sm/${img}.jpg`;
 const money = (n) => "$" + Math.round(n).toLocaleString("es-CO");
+const pct = (p) => Math.round((1 - p.price / p.before) * 100);
+const priceHTML = (p) => p.price == null ? "" : `<span class="now">${money(p.price)}</span>` + (p.before ? `<s class="was">${money(p.before)}</s><span class="pct">-${pct(p)}%</span>` : "");
+
+/* Cuenta regresiva: termina el domingo 1 de noviembre de 2026, 11:59 p. m. (hora Colombia) */
+const SALE_END = new Date("2026-11-01T23:59:59-05:00");
+function tick() {
+  const ms = SALE_END - Date.now(), pad = (n) => String(n).padStart(2, "0");
+  if (ms <= 0) { document.getElementById("cd").hidden = true; document.getElementById("cdBar").textContent = "Últimas unidades"; return; }
+  const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
+  document.getElementById("cdD").textContent = pad(d); document.getElementById("cdH").textContent = pad(h);
+  document.getElementById("cdM").textContent = pad(m); document.getElementById("cdS").textContent = pad(sec);
+  document.getElementById("cdBar").innerHTML = `Termina en <b>${d}d ${pad(h)}h ${pad(m)}m</b>`;
+}
+tick(); setInterval(tick, 1000);
 const catLabel = (k) => CATEGORIES.find(c => c[0] === k)[1];
 const waLink = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 const askMsg = (p) => `Hola, me interesa el ${p.name}. ¿Qué colores tienes disponibles?`;
@@ -443,12 +465,13 @@ PRODUCTS.forEach((p, idx) => {
   el.className = "card"; el.dataset.cat = p.cat; el.id = "p-" + p.id;
   el.innerHTML = `
     <button class="frame" style="background:${bgOf(first)}" aria-label="Ver ${p.name}">
+      <span class="badges"><span class="badge">Liquidación</span>${p.before ? `<span class="badge off">-${pct(p)}%</span>` : ""}</span>
       ${imgTag(first, "main" + (alt ? " has-alt" : ""))}
       ${alt ? imgTag(alt, "alt") : ""}
     </button>
     <div class="info">
       <button class="name">${p.name}</button>
-      <div class="price">${p.price != null ? money(p.price) : ""}</div>
+      <div class="price">${priceHTML(p)}</div>
       <div class="dots">${p.colors.map((c, i) =>
         `<button class="dot" data-i="${i}" style="background:${c.hex}" aria-label="${c.name}" title="${c.name}" aria-pressed="${i === 0}"></button>`).join("")}</div>
       <a class="ask" href="${waLink(askMsg(p))}" target="_blank" rel="noopener">${WA_SVG}Pregunta por los colores disponibles</a>
@@ -475,7 +498,7 @@ function openSheet(p, colorIdx) {
   photos = p.colors.map(c => ({ img: c.img, color: c.name })).concat(p.models.map(m => ({ img: m, color: null })));
   document.getElementById("dCat").textContent = catLabel(p.cat);
   document.getElementById("dName").textContent = p.name;
-  document.getElementById("dPrice").textContent = p.price != null ? money(p.price) : "";
+  document.getElementById("dPrice").innerHTML = priceHTML(p);
   document.getElementById("dDesc").textContent = p.desc;
   document.getElementById("dAsk").href = waLink(askMsg(p));
   document.getElementById("dSw").innerHTML = p.colors.map((c, i) =>
